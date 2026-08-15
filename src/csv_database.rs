@@ -35,6 +35,15 @@ impl CsvDatabase {
             return Err(Error::new(ErrorKind::Other, "Empty row"));
         }
 
+        let contents = fs::read_to_string(&self.path)?;
+        let new_id = row.chars().nth(0).unwrap_or_default();
+
+        for line in contents.lines() {
+            if line.starts_with(&new_id.to_string()) {
+                return Err(Error::new(ErrorKind::Other, "id already in file"));
+            }
+        }
+
         writeln!(&self.file, "{}", row)?;
         Ok(())
     }
