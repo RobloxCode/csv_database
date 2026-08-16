@@ -5,16 +5,6 @@ use csv_database::CsvDatabase;
 fn main() -> std::io::Result<()> {
     let mut csv_db = CsvDatabase::new("src/users.csv").unwrap();
 
-    match csv_db.add("") {
-        Ok(_) => {}
-        Err(e) => println!("Error {}", e),
-    }
-
-    match csv_db.add("3,patrick,23,somemail@gmail.com") {
-        Ok(_) => {}
-        Err(e) => println!("Error {}", e),
-    }
-
     match csv_db.add("3343,patrick,23,somemail@gmail.com") {
         Ok(_) => {}
         Err(e) => println!("Error {}", e),
@@ -28,7 +18,7 @@ fn main() -> std::io::Result<()> {
         None => println!("item with id {id} not found"),
     }
 
-    match csv_db.delete_by_id(3) {
+    match csv_db.delete_by_id(334) {
         Ok(_) => {}
         Err(e) => println!("Error {}", e),
     }

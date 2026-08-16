@@ -5,6 +5,9 @@ use std::io::{Error, ErrorKind, Read, Seek, SeekFrom, Write};
 #[derive(Debug)]
 pub struct CsvDatabase {
     path: String,
+    // TODO: remove this and just leave path,
+    // so that i can make every function open
+    // the file with they're needed permissions
     file: File,
 }
 
@@ -34,7 +37,7 @@ impl CsvDatabase {
         print!("{}", contents);
     }
 
-    pub fn add(&self, row: &str) -> Result<(), std::io::Error> {
+    pub fn add(&mut self, row: &str) -> Result<(), std::io::Error> {
         if row.is_empty() {
             return Err(Error::new(ErrorKind::Other, "Empty row"));
         }
