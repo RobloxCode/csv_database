@@ -24,26 +24,8 @@ impl CsvDatabase {
         })
     }
 
-    fn get_id_from_row(&self) -> Option<usize> {
-        let contents = match fs::read_to_string(&self.path) {
-            Ok(c) => c,
-            Err(_) => return None,
-        };
-
-        let split_row = contents
-            .lines()
-            .nth(0)
-            .unwrap()
-            .split(',')
-            .collect::<Vec<_>>();
-
-        if split_row.is_empty() {
-            return None;
-        }
-
-        let id = split_row.get(0)?.parse::<usize>().unwrap_or_default();
-
-        Some(id)
+    fn get_id_from_row(&self, row: &str) -> Option<usize> {
+        row.split(',').next()?.parse::<usize>().ok()
     }
 
     pub fn print_data(&mut self) {
@@ -58,7 +40,7 @@ impl CsvDatabase {
         }
 
         let contents = fs::read_to_string(&self.path)?;
-        let new_id = self.get_id_from_row().unwrap_or_default();
+        let new_id = self.get_id_from_row(row).unwrap_or_default();
 
         for line in contents.lines() {
             if line.starts_with(&new_id.to_string()) {
@@ -103,7 +85,7 @@ impl CsvDatabase {
 
         contents
             .lines()
-            .find(|l| l.starts_with(&id.to_string()))
+            .find(|l| self.get_id_from_row(l).is_some_and(|row_id| row_id == id))
             .map(|l| l.to_string())
     }
 }

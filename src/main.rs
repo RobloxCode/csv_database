@@ -15,6 +15,11 @@ fn main() -> std::io::Result<()> {
         Err(e) => println!("Error {}", e),
     }
 
+    match csv_db.add("3343,patrick,23,somemail@gmail.com") {
+        Ok(_) => {}
+        Err(e) => println!("Error {}", e),
+    }
+
     csv_db.print_data();
 
     let id = 3;
