@@ -31,13 +31,15 @@ impl CsvDatabase {
         row.split(',').next()?.parse::<usize>().ok()
     }
 
-    pub fn print_data(&mut self) {
+    pub fn print_data(&mut self) -> std::io::Result<()> {
         let mut contents = String::new();
-        let _ = self.file.read_to_string(&mut contents);
+        self.file.read_to_string(&mut contents)?;
         print!("{}", contents);
+
+        Ok(())
     }
 
-    pub fn add(&mut self, row: &str) -> Result<(), std::io::Error> {
+    pub fn add(&mut self, row: &str) -> std::io::Result<()> {
         if row.is_empty() {
             return Err(Error::new(ErrorKind::Other, "Empty row"));
         }
@@ -55,7 +57,7 @@ impl CsvDatabase {
         Ok(())
     }
 
-    pub fn delete_by_id(&mut self, id: usize) -> Result<(), std::io::Error> {
+    pub fn delete_by_id(&mut self, id: usize) -> std::io::Result<()> {
         let contents = fs::read_to_string(&self.path)?;
 
         let del_pos = contents
