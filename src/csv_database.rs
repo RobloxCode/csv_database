@@ -5,6 +5,9 @@ use std::io::{Error, ErrorKind, Read, Seek, SeekFrom, Write};
 #[derive(Debug)]
 pub struct CsvDatabase {
     path: String,
+    // TODO: remove this and just leave path,
+    // so that i can make every function open
+    // the file with they're needed permissions
     file: File,
 }
 
@@ -24,19 +27,25 @@ impl CsvDatabase {
         })
     }
 
-    pub fn print_data(&mut self) {
-        let mut contents = String::new();
-        let _ = self.file.read_to_string(&mut contents);
-        print!("{}", contents);
+    fn get_id_from_row(&self, row: &str) -> Option<usize> {
+        row.split(',').next()?.parse::<usize>().ok()
     }
 
-    pub fn add(&self, row: &str) -> Result<(), std::io::Error> {
+    pub fn print_data(&mut self) -> std::io::Result<()> {
+        let mut contents = String::new();
+        self.file.read_to_string(&mut contents)?;
+        print!("{}", contents);
+
+        Ok(())
+    }
+
+    pub fn add(&mut self, row: &str) -> std::io::Result<()> {
         if row.is_empty() {
             return Err(Error::new(ErrorKind::Other, "Empty row"));
         }
 
         let contents = fs::read_to_string(&self.path)?;
-        let new_id = row.chars().nth(0).unwrap_or_default();
+        let new_id = self.get_id_from_row(row).unwrap_or_default();
 
         for line in contents.lines() {
             if line.starts_with(&new_id.to_string()) {
@@ -48,7 +57,7 @@ impl CsvDatabase {
         Ok(())
     }
 
-    pub fn delete_by_id(&mut self, id: usize) -> Result<(), std::io::Error> {
+    pub fn delete_by_id(&mut self, id: usize) -> std::io::Result<()> {
         let contents = fs::read_to_string(&self.path)?;
 
         let del_pos = contents
@@ -81,7 +90,7 @@ impl CsvDatabase {
 
         contents
             .lines()
-            .find(|l| l.starts_with(&id.to_string()))
+            .find(|l| self.get_id_from_row(l).is_some_and(|row_id| row_id == id))
             .map(|l| l.to_string())
     }
 }
